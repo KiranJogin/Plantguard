@@ -25,19 +25,6 @@
 
 ---
 
-## 📂 Dataset Structure
-
-dataset/
-│
-├── train/
-│ ├── class_1/
-│ ├── class_2/
-│ └── ...
-│
-└── valid/
-├── class_1/
-├── class_2/
-└── ...
 
 ## Link to download the dataset
 https://drive.google.com/drive/folders/1t078VMKcXacKM0kvS2Z7-BHq5oxd9K3u?usp=sharing
@@ -70,11 +57,7 @@ https://drive.google.com/drive/folders/1t078VMKcXacKM0kvS2Z7-BHq5oxd9K3u?usp=sha
    pip install -r requirements.txt
 
 4. Train the Model
-   ```bash
 
 5. Run the Flask App
    ```bash
    python app.py
-
-
-
