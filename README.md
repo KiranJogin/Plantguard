@@ -56,8 +56,6 @@ https://drive.google.com/drive/folders/1t078VMKcXacKM0kvS2Z7-BHq5oxd9K3u?usp=sha
    ```bash
    pip install -r requirements.txt
 
-4. Train the Model
-
-5. Run the Flask App
+4. Run the Flask App
    ```bash
    python app.py
