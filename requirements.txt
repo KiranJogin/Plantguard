@@ -1,5 +1,5 @@
 # Core Deep Learning & Model
-tensorflow==2.17.0
+tensorflow==2.13.1
 keras==2.15.0
 
 # Image Processing
