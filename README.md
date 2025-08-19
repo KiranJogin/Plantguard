@@ -41,7 +41,7 @@ https://drive.google.com/drive/folders/1t078VMKcXacKM0kvS2Z7-BHq5oxd9K3u?usp=sha
    ```bash
    git clone https://github.com/yourusername/plantguard.git
    cd plantguard
-   
+
 2. Create a Virtual Environment
 
    ```bash
@@ -55,7 +55,8 @@ https://drive.google.com/drive/folders/1t078VMKcXacKM0kvS2Z7-BHq5oxd9K3u?usp=sha
 3. Install Dependencies
    ```bash
    pip install -r requirements.txt
-
-4. Run the Flask App
+4. Set up the SQL Dependencies from the MysqlSchema.txt
+   
+5. Run the Flask App
    ```bash
    python app.py
