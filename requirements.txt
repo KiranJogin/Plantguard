@@ -11,6 +11,7 @@ pandas
 
 # Web Framework
 flask==2.3.2
+Flask-MySQLdb==2.0.0
 werkzeug==2.3.7
 
 # File and Utility
