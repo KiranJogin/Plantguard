@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to PlantGuard AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin:0; padding:0;
+      height:100vh;
+      display:flex; justify-content:center; align-items:center;
+      font-family:Inter, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+      color:#fff;
+      text-align:center;
+    }
+    .container {
+      background:rgba(255,255,255,0.06);
+      padding:40px;
+      border-radius:20px;
+      box-shadow:0 20px 60px rgba(0,0,0,.3);
+      max-width:500px;
+    }
+    h1 {
+      font-family:Poppins, sans-serif;
+      font-size:clamp(28px, 5vw, 40px);
+      margin-bottom:12px;
+      color:#eafff3;
+    }
+    p { color:#d9ffea; margin-bottom:24px; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:14px 22px; margin:8px;
+      border:none; border-radius:12px; font-weight:700;
+      cursor:pointer; transition:all .2s ease;
+    }
+    .btn-primary {
+      background:linear-gradient(180deg, #2ecc71, #22c55e);
+      color:#04210f;
+      box-shadow:0 12px 28px rgba(34,197,94,.35);
+    }
+    .btn-primary:hover { transform:translateY(-2px); }
+    .btn-ghost {
+      background:transparent; border:1px solid rgba(255,255,255,0.25);
+      color:#eafff3;
+    }
+    .btn-ghost:hover { background:rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <i class="fa-solid fa-leaf" style="font-size:42px; color:#3dd087;"></i>
+    <h1>Welcome to PlantGuard AI</h1>
+    <p>AI-powered disease detection system for perennial crops.</p>
+    <div>
+      <a href="{{ url_for('login') }}"><button class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login</button></a>
+      <a href="{{ url_for('register') }}"><button class="btn btn-ghost"><i class="fa-solid fa-user-plus"></i> Register</button></a>
+      <a href="{{ url_for('about') }}"><button class="btn btn-ghost"><i class="fa-solid fa-circle-info"></i> About</button></a>
+    </div>
+  </div>
+</body>
+</html>

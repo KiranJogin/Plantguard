@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlantGuard AI — Leaf Disease Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{
+      --green-900:#0b3d2e;  --green-800:#115941;  --green-700:#166d4f;
+      --green-500:#2ecc71;  --green-400:#3dd087;  --green-300:#6ee7b7;
+      --mint:#eafff3;
+      --ink:#0f172a; --ink-2:#1f2937; --muted:#94a3b8; --white:#fff;
+      --card: rgba(255,255,255,.10); --glass:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.20);
+      --radius:16px;
+      --hero-img:url('https://images.unsplash.com/photo-1611224885990-2401b1b360bf?q=80&w=1600&auto=format&fit=crop');
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--white);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    .nav{position:sticky; top:0; z-index:20; backdrop-filter:saturate(1.2) blur(10px);
+      background:linear-gradient(0deg, rgba(5,20,14,.45), rgba(5,20,14,.45));
+      border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .brand i{color:var(--green-400)}
+    .nav a{color:#e5f7ee; text-decoration:none; font-weight:600; opacity:.9}
+    .nav a:hover{opacity:1; color:var(--green-300)}
+    .nav ul{display:flex; gap:18px; list-style:none; margin:0; padding:0}
+
+    .hero{position:relative; isolation:isolate;}
+    .hero::before{content:""; position:absolute; inset:0; z-index:-2;
+      background:linear-gradient( to bottom, rgba(3,17,12,.65), rgba(3,17,12,.85) 60%, rgba(3,17,12,1) ), var(--hero-img);
+      background-size:cover; background-position:center; filter:saturate(1.1) contrast(1.05)}
+    .hero-inner{max-width:1100px; margin:0 auto; padding:72px 20px 48px; text-align:center}
+    .eyebrow{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.4px; background:rgba(46,204,113,.15); color:#dbffe9; border:1px solid rgba(46,204,113,.35)}
+    .h1{font-family:Poppins, Inter, sans-serif; font-size:clamp(34px, 6vw, 56px); line-height:1.05; margin:14px auto 10px; max-width:12ch;}
+    .sub{max-width:60ch; margin:0 auto 26px; color:#d9ffea; opacity:.92}
+    .cta{display:inline-flex; gap:12px; flex-wrap:wrap; justify-content:center}
+    .btn{appearance:none; border:none; cursor:pointer; padding:14px 22px; border-radius:12px; font-weight:800; letter-spacing:.2px; transition:transform .12s ease, box-shadow .2s ease, background .2s ease}
+    .btn-primary{background:linear-gradient(180deg, var(--green-500), #22c55e); color:#04210f; box-shadow:0 15px 35px rgba(34,197,94,.35)}
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-ghost{background:transparent; color:#eafff3; border:1px solid rgba(255,255,255,.18)}
+    
+      /* Dropdown Styling */
+select {
+  background-color: rgba(255, 255, 255, 0.1); /* semi-transparent dark bg */
+  color: #eafff3; /* light text */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  width: 100%;
+  appearance: none; /* removes default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Dropdown focus effect */
+select:focus {
+  border-color: var(--green-300);
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+/* Dropdown option styling */
+select option {
+  background: #0b3d2e; /* deep green */
+  color: #ffffff;
+  padding: 10px;
+}
+
+
+
+    section{scroll-margin-top:80px}
+    .section{max-width:1100px; margin:0 auto; padding:56px 20px}
+    .section h2{font-family:Poppins,Inter,sans-serif; font-size:clamp(24px, 4vw, 36px); margin:0 0 22px}
+    .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .step{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:22px; box-shadow:var(--shadow); text-align:center}
+    .step .icon{width:54px; height:54px; border-radius:14px; display:grid; place-items:center; margin:0 auto 14px; background:rgba(46,204,113,.18); border:1px solid rgba(46,204,113,.35)}
+    .step h3{margin:6px 0 8px}
+    .step p{color:#e4fff2; opacity:.9; margin:0}
+
+    .card{background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:20px; box-shadow:var(--shadow); padding:24px}
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:20px; align-items:center}
+    .drop{border:2px dashed rgba(255,255,255,.35); border-radius:16px; padding:20px; text-align:center; transition:border-color .2s ease, background .2s ease}
+    .drop.dragover{border-color:var(--green-300); background:rgba(110,231,183,.12)}
+    input[type=file]{display:none}
+    .btn-file{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; background:#fff; color:#0b1b13; border-radius:10px; font-weight:800; border:none; box-shadow:0 10px 24px rgba(0,0,0,.25)}
+    .meta{font-size:13px; opacity:.9; margin-top:8px}
+    .preview{display:none; margin-top:14px}
+    .preview img{width:min(460px,100%); border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,.35)}
+    .actions{margin-top:16px; display:flex; gap:12px; flex-wrap:wrap}
+    label{font-weight:600; display:block; margin-top:12px}
+    select{margin-top:4px; width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.1); color:#fff}
+
+    .toast{display:none; margin-top:14px; padding:12px 14px; background:#1e7f53; border:1px solid rgba(255,255,255,.18); border-radius:10px; font-weight:700}
+    footer{padding:34px 16px; text-align:center; color:#d6ffe9; background:rgba(0,0,0,.2); border-top:1px solid rgba(255,255,255,.08)}
+    .social a{color:#eafff3; margin:0 8px}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} .steps{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/index"><i class="fa-solid fa-leaf"></i> PlantGuard&nbsp;AI</a>
+      <nav>
+        <ul>
+          <li><a href="/index">Home</a></li>
+          <li><a href="/history">History</a></li>
+          <li><a href="/about2">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <span class="eyebrow"><i class="fa-solid fa-sparkles"></i> AI Powered</span>
+      <h1 class="h1">Try our AI-Powered<br/> PLANTGUARD <br/>Disease Detection</h1>
+      <p class="sub">Snap a photo of your plant leaf and get an instant health check.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#classifier"><i class="fa-solid fa-cloud-arrow-up"></i> Try Now</a>
+        <a class="btn btn-ghost" href="#how"><i class="fa-solid fa-circle-question"></i> How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><div class="icon"><i class="fa-solid fa-camera"></i></div><h3>Click a Pic</h3><p>Take a clear photo of a single leaf.</p></div>
+      <div class="step"><div class="icon"><i class="fa-solid fa-cloud-arrow-up"></i></div><h3>Upload on PlantGuard</h3><p>Drop it below or choose from your gallery.</p></div>
+      <div class="step"><div class="icon"><i class="fa-solid fa-list-check"></i></div><h3>Get a Quick Report</h3><p>We analyze and show results instantly.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="classifier">
+    <div class="card">
+      <div class="grid">
+        <!-- Left Form -->
+        <div>
+          <h2 style="margin-top:0">Plant Disease Classifier</h2>
+          <form id="uploadForm" autocomplete="off">
+            <label class="drop" id="dropZone" for="fileInput">
+              <div>
+                <button type="button" class="btn-file" id="pickBtn"><i class="fa-solid fa-upload"></i> Choose image</button>
+                <div class="meta">JPG, PNG, or WEBP up to 10MB • Drag & drop supported</div>
+              </div>
+              <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,image/webp" />
+              <div class="preview" id="preview">
+                <img id="previewImg" alt="Selected image preview" />
+              </div>
+            </label>
+
+            <!-- Meta Inputs -->
+            <label for="severity">Severity Level:</label>
+            <select id="severity" name="severity" required>
+              <option value="">-- Select Severity Level --</option>
+              <option value="Mild">Mild</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Severe">Severe</option>
+            </select>
+
+            <label for="soil">Soil Type</label>
+            <select id="soil" name="soil" required>
+              <option value="">-- Select Soil --</option>
+              <option value="Loamy">Loamy</option>
+              <option value="Sandy">Sandy</option>
+              <option value="Clay">Clay</option>
+              <option value="Silty">Silty</option>
+              <option value="Peaty">Peaty</option>
+              <option value="Chalky">Chalky</option>
+            </select>
+
+            <label for="weather">Weather Condition</label>
+            <select id="weather" name="weather" required>
+              <option value="">-- Select Weather --</option>
+              <option value="Sunny">Sunny</option>
+              <option value="Rainy">Rainy</option>
+              <option value="Humid">Humid</option>
+              <option value="Cloudy">Cloudy</option>
+              <option value="Windy">Windy</option>
+              <option value="Dry">Dry</option>
+            </select>
+
+            <div class="actions">
+              <button id="predictBtn" class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Predict</button>
+              <button id="clearBtn" class="btn btn-ghost" type="button"><i class="fa-solid fa-eraser"></i> Clear</button>
+            </div>
+            <div class="toast" id="alertBox"></div>
+          </form>
+        </div>
+
+        <!-- Right Image -->
+        <div>
+          <img src="{{ url_for('static', filename='img.png') }}" style="width:100%; border-radius:14px; box-shadow:var(--shadow); aspect-ratio:4/3; object-fit:cover;"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="social">
+      <a href="#"><i class="fab fa-facebook-square"></i></a>
+      <a href="#"><i class="fab fa-twitter-square"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-github-square"></i></a>
+    </div>
+    <div style="opacity:.8; font-size:13px; margin-top:8px">© 2025 PlantGuard AI. All rights reserved.</div>
+  </footer>
+
+  <script>
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+  const previewImg = document.getElementById('previewImg');
+  const dropZone = document.getElementById('dropZone');
+  const alertBox = document.getElementById('alertBox');
+  const predictBtn = document.getElementById('predictBtn');
+  const pickBtn = document.getElementById('pickBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const form = document.getElementById('uploadForm');
+
+  function showAlert(msg, bg="#1e7f53"){ 
+    alertBox.textContent = msg; 
+    alertBox.style.backgroundColor = bg; 
+    alertBox.style.display = 'block'; 
+  }
+  function hideAlert(){ alertBox.style.display='none'; }
+
+  function isValidFile(file){
+    if(!file) return false;
+    const allowed = ['image/jpeg','image/png','image/jpg','image/webp'];
+    if(!allowed.includes(file.type)) { 
+      showAlert('Only JPG, PNG, WEBP images are allowed.', '#b91c1c'); 
+      return false; 
+    }
+    if(file.size > 10*1024*1024){ 
+      showAlert('File too large (max 10MB).', '#b91c1c'); 
+      return false; 
+    }
+    return true;
+  }
+
+  function setPreview(file){
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    preview.style.display = 'block';
+    pickBtn.style.display = 'none';   // 🔥 Hide "Choose image" after upload
+    previewImg.onload = () => URL.revokeObjectURL(url);
+  }
+
+  // Drag & Drop
+  dropZone.addEventListener('drop', e => { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+    dropZone.classList.remove('dragover'); 
+    const file = e.dataTransfer.files?.[0]; 
+    if(isValidFile(file)){ 
+      fileInput.files = e.dataTransfer.files; 
+      setPreview(file); 
+      hideAlert(); 
+    } 
+  });
+
+  // Pick file manually
+  pickBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { 
+    const file = fileInput.files[0]; 
+    if(isValidFile(file)){ 
+      setPreview(file); 
+      hideAlert(); 
+    } 
+  });
+ // Clear button
+  clearBtn.addEventListener('click', () => { 
+    fileInput.value = ''; 
+    previewImg.src = ''; 
+    preview.style.display = 'none'; 
+    pickBtn.style.display = 'inline-flex';   // 🔥 Show button again after clear
+    hideAlert(); 
+    localStorage.removeItem('pgai:result'); 
+  });
+    async function analyzeLeafFromFile(file){
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('severity', document.getElementById('severity').value);
+      formData.append('soil', document.getElementById('soil').value);
+      formData.append('weather', document.getElementById('weather').value);
+
+      const res = await fetch('/api/predict', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Prediction request failed.');
+      return await res.json();
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if(!isValidFile(file)) { showAlert('Unsupported file type', '#b91c1c'); return; }
+      if (!file) { showAlert('Please attach an image.', '#b91c1c'); return; }
+
+      predictBtn.disabled = true;
+      predictBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Predicting…';
+      showAlert('Sending image to server…');
+      try{
+        const result = await analyzeLeafFromFile(file);
+        localStorage.setItem('pgai:result', JSON.stringify({
+          image: result.image_url,
+          prediction: result.predicted_class,
+          confidencePct: Math.round(result.confidence * 10000) / 100,
+          severity: result.severity,
+          soil: result.soil,
+          weather: result.weather,
+          solution: result.solution,
+          tips: result.tips,
+          ts: Date.now()
+        }));
+        showAlert('Prediction complete. Opening results…', '#1d4ed8');
+        setTimeout(()=> window.location.href = '/result', 600);
+      }catch(err){
+        console.error(err);
+        showAlert('Something went wrong.', '#b91c1c');
+      }finally{
+        predictBtn.disabled = false;
+        predictBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Predict';
+      }
+    });
+  </script>
+</body>
+</html>
