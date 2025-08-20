@@ -22,7 +22,7 @@ SCALE_INPUTS_0_1 = False
 # FLASK APP
 # =======================
 app = Flask(__name__)
-app.secret_key = "kiranjogin"   # change in production
+app.secret_key = "kiranjogin"   
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -61,10 +61,9 @@ CLASS_NAMES = [
 # =======================
 metadata_df = pd.read_excel("PlantGuard_Metadata.xlsx")
 
-def get_solution_and_tips(disease, severity, soil, weather):
+def get_solution_and_tips(disease, soil, weather):
     row = metadata_df[
         (metadata_df["Disease"] == disease) &
-        (metadata_df["Severity"] == severity) &
         (metadata_df["Soil"] == soil) &
         (metadata_df["Weather"] == weather)
     ]
@@ -119,7 +118,6 @@ def about():
 @app.route("/about2")
 def about2():
     return render_template("about2.html")
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -214,7 +212,28 @@ def index():
 @app.route("/result")
 @login_required
 def result_page():
-    return render_template("result.html")
+    prediction_id = request.args.get("id")
+    if prediction_id:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips, predicted_at FROM predictions WHERE id=%s", (prediction_id,))
+        row = cur.fetchone()
+        cur.close()
+        if row:
+            prediction = {
+                "id": row[0],
+                "image": row[1],
+                "prediction": row[2],
+                "confidencePct": round(row[3]*100, 2),
+                "severity": row[4],
+                "soil": row[5],
+                "weather": row[6],
+                "solution": row[7],
+                "tips": row[8],
+                "timestamp": row[9].strftime("%Y-%m-%d %H:%M:%S") if row[9] else ""
+            }
+            return render_template("result.html", prediction=prediction)
+    # fallback: empty result page
+    return render_template("result.html", prediction=None)
 
 @app.route("/history")
 @login_required
@@ -256,11 +275,11 @@ def delete_prediction(prediction_id):
 # =======================
 # API: PREDICT IMAGE
 # =======================
+
 @app.route("/api/predict", methods=["POST"])
 @login_required
 def api_predict():
     file = request.files.get("image")
-    severity = request.form.get("severity")
     soil = request.form.get("soil")
     weather = request.form.get("weather")
 
@@ -276,7 +295,20 @@ def api_predict():
     idx, conf, prob_vec = predict_image(save_path)
     disease_class = CLASS_NAMES[idx]
 
-    solution, tips = get_solution_and_tips(disease_class, severity, soil, weather)
+    # 🔥 Predict severity from metadata
+    row = metadata_df[
+        (metadata_df["Disease"] == disease_class) &
+        (metadata_df["Soil"] == soil) &
+        (metadata_df["Weather"] == weather)
+    ]
+    if not row.empty:
+        severity = row.iloc[0]["Severity"]
+        solution = row.iloc[0]["Solution"]
+        tips = row.iloc[0]["Tips"]
+    else:
+        severity = "Unknown"
+        solution = "No specific solution available. Consult experts."
+        tips = "Maintain good agricultural practices."
 
     cur = mysql.connection.cursor()
     cur.execute("""INSERT INTO predictions
@@ -299,9 +331,9 @@ def api_predict():
         "probabilities": {CLASS_NAMES[i]: float(prob_vec[i]) for i in range(len(CLASS_NAMES))}
     })
 
+
 # =======================
 # MAIN
 # =======================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
