@@ -156,7 +156,7 @@ select option {
             <label class="drop" id="dropZone" for="fileInput">
               <div>
                 <button type="button" class="btn-file" id="pickBtn"><i class="fa-solid fa-upload"></i> Choose image</button>
-                <div class="meta">JPG, PNG, or WEBP up to 10MB • Drag & drop supported</div>
+                <p id="fileHint" class="meta">JPG, PNG, or WEBP up to 10MB • Drag & drop supported</p>
               </div>
               <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,image/webp" />
               <div class="preview" id="preview">
@@ -165,14 +165,6 @@ select option {
             </label>
 
             <!-- Meta Inputs -->
-            <label for="severity">Severity Level:</label>
-            <select id="severity" name="severity" required>
-              <option value="">-- Select Severity Level --</option>
-              <option value="Mild">Mild</option>
-              <option value="Moderate">Moderate</option>
-              <option value="Severe">Severe</option>
-            </select>
-
             <label for="soil">Soil Type</label>
             <select id="soil" name="soil" required>
               <option value="">-- Select Soil --</option>
@@ -231,6 +223,17 @@ select option {
   const pickBtn = document.getElementById('pickBtn');
   const clearBtn = document.getElementById('clearBtn');
   const form = document.getElementById('uploadForm');
+  const fileHint = document.getElementById('fileHint');
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) {
+    // hide the hint once a file is selected
+    fileHint.style.display = "none";
+  } else {
+    // show the hint again if file is cleared
+    fileHint.style.display = "block";
+  }
+});
 
   function showAlert(msg, bg="#1e7f53"){ 
     alertBox.textContent = msg; 
@@ -295,7 +298,6 @@ select option {
     async function analyzeLeafFromFile(file){
       const formData = new FormData();
       formData.append('image', file);
-      formData.append('severity', document.getElementById('severity').value);
       formData.append('soil', document.getElementById('soil').value);
       formData.append('weather', document.getElementById('weather').value);
 
@@ -316,16 +318,16 @@ select option {
       try{
         const result = await analyzeLeafFromFile(file);
         localStorage.setItem('pgai:result', JSON.stringify({
-          image: result.image_url,
-          prediction: result.predicted_class,
-          confidencePct: Math.round(result.confidence * 10000) / 100,
-          severity: result.severity,
-          soil: result.soil,
-          weather: result.weather,
-          solution: result.solution,
-          tips: result.tips,
-          ts: Date.now()
-        }));
+        image: result.image_url,
+        prediction: result.predicted_class,
+        confidencePct: Math.round(result.confidence * 10000) / 100,
+        severity: result.severity,   // 🔥 ADD THIS LINE
+        soil: result.soil,
+        weather: result.weather,
+        solution: result.solution,
+        tips: result.tips,
+        ts: Date.now()
+      }));
         showAlert('Prediction complete. Opening results…', '#1d4ed8');
         setTimeout(()=> window.location.href = '/result', 600);
       }catch(err){
