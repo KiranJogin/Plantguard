@@ -43,12 +43,15 @@
     .nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.2) blur(10px);
       background:linear-gradient(0deg, rgba(5,20,14,.45), rgba(5,20,14,.45));
       border-bottom:1px solid rgba(255,255,255,.08)}
-    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+      .nav{position:sticky; top:0; z-index:20; backdrop-filter:saturate(1.2) blur(10px);
+      background:linear-gradient(0deg, rgba(5,20,14,.45), rgba(5,20,14,.45));
+      border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
     .brand i{color:var(--green-400)}
-    .nav a{color:#e5f7ee;text-decoration:none;font-weight:600;opacity:.9}
-    .nav a:hover{opacity:1;color:var(--green-300)}
-    .nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0}
+    .nav a{color:#e5f7ee; text-decoration:none; font-weight:600; opacity:.9}
+    .nav a:hover{opacity:1; color:var(--green-300)}
+    .nav ul{display:flex; gap:18px; list-style:none; margin:0; padding:0}
 
     .section{max-width:1100px;margin:0 auto;padding:56px 20px}
     .card{background:var(--glass);border:1px solid rgba(255,255,255,.14);border-radius:20px;
@@ -104,42 +107,35 @@
           <img id="resultImage" class="shot" alt="Leaf image"/>
         </div>
         <div>
-          <h2 style="margin:0 0 6px">Prediction Result</h2>
+          <h2 style="margin:0 0 6px; font-size:24px; font-weight:700;">Prediction Result</h2>
           <div id="ts" class="meta"></div>
 
-          <p class="meta" style="margin:18px 0 8px"><strong>Predicted Class:</strong></p>
-          <div id="clsWrap" class="badge" style="margin-bottom:12px">
-            <i class="fa-solid fa-circle-check"></i>
-            <span id="cls">—</span>
-          </div>
+          <p class="meta" style="margin:18px 0 8px; font-size:large"><strong>Predicted Class:</strong></p>
+        <div id="clsWrap" class="badge" style="margin-bottom:12px; font-size:22px; padding:10px 16px;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="cls" style="font-size:14px; font-weight:900;">—</span>
+        </div>
 
-          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 4px">
-            <div class="ring" id="ring"><span id="pct">0%</span></div>
-            <div>
-              <!-- <div style="font-weight:800;font-size:18px; color: var(--white)">Confidence</div> -->
-              <div class="meta"><span id="pctText">0%</span></div>
+          <div style="margin:8px 0 4px">
+        <h3 style="color:#fff; font-size:  20px;">Severity Level</h3>
+        <p id="severity" class="meta"style="font-size:18px;"></p>
 
-              <div style="margin-top:18px">
-                <h3 style="color:#fff">Severity</h3>
-                <p id="severity" class="meta"></p>
+        <h3 style="color:#fff; margin-top:12px; font-size:  20px;">Soil Type</h3>
+        <p id="soil" class="meta" style="font-size:18px;"></p>
 
-                <h3 style="color:#fff; margin-top:12px">Soil Type</h3>
-                <p id="soil" class="meta"></p>
+        <h3 style="color:#fff; margin-top:12px; font-size:  20px;">Weather Condition</h3>
+        <p id="weather" class="meta" style="font-size:18px;"></p>
 
-                <h3 style="color:#fff; margin-top:12px">Weather Condition</h3>
-                <p id="weather" class="meta"></p>
+        <h3 style="color:#fff; margin-top:12px; font-size:  20px;">Solution</h3>
+        <p id="solution" class="meta" style="font-size:18px;"></p>
 
-                <h3 style="color:#fff; margin-top:12px">Solution</h3>
-                <p id="solution" class="meta"></p>
+        <h3 style="color:#fff; margin-top:12px">Tips</h3>
+        <p id="tips" class="meta"style="font-size:18px;"></p>
+      </div>
 
-                <h3 style="color:#fff; margin-top:12px">Tips</h3>
-                <p id="tips" class="meta"></p>
-              </div>
-            </div>
-          </div>
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px">
-            <a class="btn btn-primary" href="/"><i class="fa-solid fa-arrow-left"></i> Try Again</a>
+            <a class="btn btn-primary" href="/index"><i class="fa-solid fa-arrow-left"></i> Try Again</a>
             <button class="btn btn-ghost" id="clearBtn"><i class="fa-solid fa-eraser"></i> Clear result</button>
           </div>
         </div>
@@ -158,9 +154,6 @@
     const imgEl = document.getElementById('resultImage');
     const clsEl = document.getElementById('cls');
     const clsWrap = document.getElementById('clsWrap');
-    const ring = document.getElementById('ring');
-    const pctEl = document.getElementById('pct');
-    const pctText = document.getElementById('pctText');
     const tsEl = document.getElementById('ts');
     const clearBtn = document.getElementById('clearBtn');
 
@@ -172,9 +165,6 @@
       clsEl.textContent = result.prediction;
       tsEl.textContent = 'Generated locally • ' + new Date().toLocaleString();
       const pct = Math.max(0, Math.min(100, Number(result.confidencePct ?? 0)));
-      ring.style.setProperty('--pct', pct);
-      pctEl.textContent = pct.toFixed(0) + '%';
-      pctText.textContent = pct.toFixed(2) + '%';
 
       const lower = String(result.prediction || '').toLowerCase();
       clsWrap.classList.remove('ok','warn','err');
@@ -201,4 +191,3 @@
   </script>
 </body>
 </html>
-
