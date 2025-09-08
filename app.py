@@ -22,7 +22,7 @@ SCALE_INPUTS_0_1 = False
 # FLASK APP
 # =======================
 app = Flask(__name__)
-app.secret_key = "kiranjogin"   
+app.secret_key = "kiranjogin"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -69,7 +69,7 @@ def get_solution_and_tips(disease, soil, weather):
     ]
     if not row.empty:
         return row.iloc[0]["Solution"], row.iloc[0]["Tips"]
-    return ("No specific solution available. Consult experts.", 
+    return ("No specific solution available. Consult experts.",
             "Maintain good agricultural practices.")
 
 # =======================
@@ -212,10 +212,14 @@ def index():
 @app.route("/result")
 @login_required
 def result_page():
-    prediction_id = request.args.get("id")
+    prediction_id = request.args.get("id", type=int)  # force int
     if prediction_id:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips, predicted_at FROM predictions WHERE id=%s", (prediction_id,))
+        cur.execute("""
+            SELECT id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips, predicted_at
+            FROM predictions
+            WHERE id = %s
+        """, (prediction_id,))
         row = cur.fetchone()
         cur.close()
         if row:
@@ -232,16 +236,21 @@ def result_page():
                 "timestamp": row[9].strftime("%Y-%m-%d %H:%M:%S") if row[9] else ""
             }
             return render_template("result.html", prediction=prediction)
-    # fallback: empty result page
     return render_template("result.html", prediction=None)
 
 @app.route("/history")
 @login_required
 def history_page():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips, predicted_at FROM predictions ORDER BY created_at DESC")
+    # If you add user_id column, uncomment WHERE user_id = %s
+    cur.execute("""
+        SELECT id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips, predicted_at
+        FROM predictions
+        ORDER BY created_at DESC
+    """)
     rows = cur.fetchall()
     cur.close()
+
     history = []
     for r in rows:
         history.append({
@@ -258,14 +267,10 @@ def history_page():
         })
     return render_template("history.html", history=history)
 
-import sqlite3
-
-
 @app.route("/delete_prediction/<int:prediction_id>")
 @login_required
 def delete_prediction(prediction_id):
     cur = mysql.connection.cursor()
-    # optional: ensure only the user who owns the prediction can delete it
     cur.execute("DELETE FROM predictions WHERE id = %s", (prediction_id,))
     mysql.connection.commit()
     cur.close()
@@ -275,7 +280,6 @@ def delete_prediction(prediction_id):
 # =======================
 # API: PREDICT IMAGE
 # =======================
-
 @app.route("/api/predict", methods=["POST"])
 @login_required
 def api_predict():
@@ -295,7 +299,6 @@ def api_predict():
     idx, conf, prob_vec = predict_image(save_path)
     disease_class = CLASS_NAMES[idx]
 
-    # 🔥 Predict severity from metadata
     row = metadata_df[
         (metadata_df["Disease"] == disease_class) &
         (metadata_df["Soil"] == soil) &
@@ -311,10 +314,18 @@ def api_predict():
         tips = "Maintain good agricultural practices."
 
     cur = mysql.connection.cursor()
-    cur.execute("""INSERT INTO predictions
-        (image_path, predicted_class, confidence, severity, soil, weather, solution, tips)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-        (save_path, disease_class, conf, severity, soil, weather, solution, tips))
+    # Insert with or without user_id
+    try:
+        cur.execute("""
+            INSERT INTO predictions (user_id, image_path, predicted_class, confidence, severity, soil, weather, solution, tips)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (session["user_id"], save_path, disease_class, conf, severity, soil, weather, solution, tips))
+    except:
+        cur.execute("""
+            INSERT INTO predictions (image_path, predicted_class, confidence, severity, soil, weather, solution, tips)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (save_path, disease_class, conf, severity, soil, weather, solution, tips))
+
     mysql.connection.commit()
     cur.close()
 
@@ -330,7 +341,6 @@ def api_predict():
         "tips": tips,
         "probabilities": {CLASS_NAMES[i]: float(prob_vec[i]) for i in range(len(CLASS_NAMES))}
     })
-
 
 # =======================
 # MAIN
