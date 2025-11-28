@@ -1,0 +1,255 @@
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to PlantGuard AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin:0; padding:0;
+      height:100vh;
+      display:flex; justify-content:center; align-items:center;
+      font-family:Inter, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+      color:#fff;
+      text-align:center;
+    }
+    .container {
+      background:rgba(255,255,255,0.06);
+      padding:40px;
+      border-radius:20px;
+      box-shadow:0 20px 60px rgba(0,0,0,.3);
+      max-width:500px;
+    }
+    h1 {
+      font-family:Poppins, sans-serif;
+      font-size:clamp(28px, 5vw, 40px);
+      margin-bottom:12px;
+      color:#eafff3;
+    }
+    p { color:#d9ffea; margin-bottom:24px; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:14px 22px; margin:8px;
+      border:none; border-radius:12px; font-weight:700;
+      cursor:pointer; transition:all .2s ease;
+    }
+    .btn-primary {
+      background:linear-gradient(180deg, #2ecc71, #22c55e);
+      color:#04210f;
+      box-shadow:0 12px 28px rgba(34,197,94,.35);
+    }
+    .btn-primary:hover { transform:translateY(-2px); }
+    .btn-ghost {
+      background:transparent; border:1px solid rgba(255,255,255,0.25);
+      color:#eafff3;
+    }
+    .btn-ghost:hover { background:rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <i class="fa-solid fa-leaf" style="font-size:42px; color:#3dd087;"></i>
+    <h1>Welcome to PlantGuard AI</h1>
+    <p>AI-powered disease detection system for perennial crops.</p>
+    <div>
+      <a href="{{ url_for('login') }}"><button class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login</button></a>
+      <a href="{{ url_for('register') }}"><button class="btn btn-ghost"><i class="fa-solid fa-user-plus"></i> Register</button></a>
+      <a href="{{ url_for('about') }}"><button class="btn btn-ghost"><i class="fa-solid fa-circle-info"></i> About</button></a>
+    </div>
+  </div>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — PlantGuard AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{
+      --green-900:#0b3d2e;  --green-800:#115941;  --green-700:#166d4f;
+      --green-500:#2ecc71;  --green-400:#3dd087;  --green-300:#6ee7b7;
+      --white:#fff; --muted:#94a3b8; --glass:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.20);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    /* Nav */
+    .nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.2) blur(10px);background:linear-gradient(0deg, rgba(5,20,14,.45), rgba(5,20,14,.45));border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand i{color:var(--green-400)}
+    .nav a{color:#e5f7ee;text-decoration:none;font-weight:600;opacity:.9}
+    .nav a:hover{opacity:1;color:var(--green-300)}
+    .nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0}
+
+    /* Hero */
+    .hero{position:relative;isolation:isolate}
+    .hero::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(to bottom, rgba(3,17,12,.65), rgba(3,17,12,.85) 60%, rgba(3,17,12,1)), url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop');background-size:cover;background-position:center;filter:saturate(1.1) contrast(1.05)}
+    .hero-inner{max-width:1100px;margin:0 auto;padding:72px 20px 48px;text-align:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.4px;background:rgba(46,204,113,.15);color:#dbffe9;border:1px solid rgba(46,204,113,.35)}
+    .h1{font-family:Poppins,Inter,sans-serif;font-size:clamp(34px,6vw,56px);line-height:1.05;margin:14px auto 10px;max-width:16ch}
+    .sub{max-width:60ch;margin:0 auto 26px;color:#d9ffea;opacity:.92}
+    .btn{appearance:none;border:none;cursor:pointer;padding:14px 22px;border-radius:12px;font-weight:800;letter-spacing:.2px;transition:transform .12s ease,box-shadow .2s ease,background .2s ease}
+    .btn-primary{background:linear-gradient(180deg, var(--green-500), #22c55e);color:#04210f;box-shadow:0 15px 35px rgba(34,197,94,.35)}
+    .btn-ghost{background:transparent;color:#eafff3;border:1px solid rgba(255,255,255,.18)}
+
+    /* Sections */
+    section{scroll-margin-top:80px}
+    .section{max-width:1100px;margin:0 auto;padding:56px 20px}
+    .section h2{font-family:Poppins,Inter,sans-serif;font-size:clamp(24px,4vw,36px);margin:0 0 18px}
+    .card{background:var(--glass);border:1px solid rgba(255,255,255,.14);border-radius:20px;box-shadow:var(--shadow);padding:24px}
+
+    /* Grid + features */
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .feature{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;text-align:left}
+    .feature .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:rgba(46,204,113,.18);border:1px solid rgba(46,204,113,.35);margin-bottom:10px}
+
+    /* Steps */
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .step{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:20px;text-align:center}
+    .step .icon{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;margin:0 auto 12px;background:rgba(46,204,113,.18);border:1px solid rgba(46,204,113,.35)}
+
+    /* FAQ */
+    details{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px}
+    details+details{margin-top:10px}
+    summary{cursor:pointer;font-weight:800}
+
+    footer{padding:34px 16px;text-align:center;color:#d6ffe9;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.08)}
+
+    @media (max-width:900px){.grid-3{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="/"><i class="fa-solid fa-leaf"></i> PlantGuard&nbsp;AI</a>
+      <nav aria-label="main">
+        <ul>
+          <!-- <li><a href="index.html#how">How it works</a></li>
+          <li><a href="index.html#classifier">Try it</a></li>
+          <li><a href="index.html#history">History</a></li>
+          <li><a href="about.html" aria-current="page">About</a></li> -->
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <span class="eyebrow"><i class="fa-solid fa-book-open"></i> Learn more</span>
+      <h1 class="h1">About PlantGuard&nbsp;AI</h1>
+      <p class="sub">An AI-powered system for early detection and diagnosis of diseases in perennial plants.</p>
+      <a href="{{ url_for('login') }}"><button class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login</button></a>
+      <a href="{{ url_for('register') }}"><button class="btn btn-ghost"><i class="fa-solid fa-user-plus"></i> Register</button></a>
+    </div>
+  </section>
+
+  <!-- Mission -->
+  <section class="section" id="mission">
+    <div class="card">
+      <h2>Our mission</h2>
+      <p>PlantGuard helps growers spot issues earlier so they can act sooner and waste less. It uses a trained deep learning model to analyze leaf images and identify diseases with high accuracy, providing quick and reliable results.</p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <h2>What PlantGuard can do</h2>
+    <div class="grid-3">
+      <article class="feature">
+        <div class="icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>On-device by default</h3>
+        <p>Images are processed locally in the demo. For deployment, swap in your model for full classification without sending data to a server.</p>
+      </article>
+      <article class="feature">
+        <div class="icon"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>Early alerts</h3>
+        <p>Catch stress patterns quickly and respond before minor issues become yield-threatening problems.</p>
+      </article>
+      <article class="feature">
+        <div class="icon"><i class="fa-solid fa-satellite-dish"></i></div>
+        <h3>Low-connectivity friendly</h3>
+        <p>Runs in modern browsers with no network call—ideal for fields with spotty coverage.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="glance">
+    <div class="card">
+      <h2>How it works (at a glance)</h2>
+      <div class="steps">
+        <article class="step">
+          <div class="icon"><i class="fa-solid fa-camera"></i></div>
+          <h3>Capture</h3>
+          <p>Take a single-leaf photo in good light.</p>
+        </article>
+        <article class="step">
+          <div class="icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <h3>Analyze</h3>
+          <p>The AI model computes disease classification and confidence.</p>
+        </article>
+        <article class="step">
+          <div class="icon"><i class="fa-solid fa-clipboard-check"></i></div>
+          <h3>Act</h3>
+          <p>View predicted class and confidence, then log results or share with agronomy tools.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research -->
+  <section class="section" id="research">
+    <div class="card">
+      <h2>Backed by research</h2>
+      <p>PlantGuard is inspired by strong results from CNNs and transfer learning for plant disease detection, plus evidence that earlier detection reduces crop loss and chemical use.</p>
+      <ul>
+        <li>High accuracy from CNN/transfer-learning approaches.</li>
+        <li>Value of early detection for yield protection and smarter input use.</li>
+        <li>Focus on perennial crops such as coffee, tea, and cinnamon.</li>
+      </ul>
+      <div style="margin-top:12px">
+        <!-- <a class="btn btn-ghost" href="#faq"><i class="fa-solid fa-circle-question"></i> Read FAQs</a> -->
+        <!-- <a class="btn btn-primary" href="{{ url_for('index') }}"><i class="fa-solid fa-cloud-arrow-up"></i> Try the demo</a> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is my photo uploaded to a server?</summary>
+      <p>No. In this demo, your image is processed locally and never leaves your device.</p>
+    </details>
+    <details>
+      <summary>What does the demo model do?</summary>
+      <p>The sample version uses a lightweight method. Swap this for your trained CNN model when deploying.</p>
+    </details>
+    <details>
+      <summary>Can I keep a record of my scans?</summary>
+      <p>Yes. The homepage includes a History section that stores results on your device using localStorage.</p>
+    </details>
+  </section>
+
+  <footer>
+    <div style="opacity:.8;font-size:13px">© 2025 PlantGuard AI. All rights reserved.</div>
+  </footer>
+</body>
+</html>

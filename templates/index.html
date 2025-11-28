@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlantGuard AI — Leaf Disease Classifier</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --green-900:#0b3d2e;  
+      --green-800:#115941;  
+      --green-700:#166d4f;
+      --green-500:#2ecc71;  
+      --green-400:#3dd087;  
+      --green-300:#6ee7b7;
+      --mint:#eafff3;
+      --white:#fff;
+      --glass:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.20);
+    }
+
+    body{
+      margin:0;
+      color:var(--white);
+      font-family:Inter,system-ui;
+      background: radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+    }
+
+    /* Navbar */
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:saturate(1.2) blur(10px);
+      background:rgba(5,20,14,.45);
+      border-bottom:1px solid rgba(255,255,255,.1)
+    }
+    .nav-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .nav a{
+      color:#e5f7ee;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    /* Section */
+    .hero{
+    padding:35px 20px 20px;  /* reduced from 70px top / 50px bottom */
+    text-align:center;
+}
+    .hero h1{
+      font-size:48px;
+      font-family:Poppins;
+      margin-bottom:10px;
+    }
+    .hero .sub{
+      opacity:.85;
+      max-width:600px;
+      margin:0 auto 20px;
+    }
+
+    .section{
+    max-width:1100px;
+    margin:0 auto;
+    padding:25px 20px;       /* reduced from 50px */
+    margin-top:-10px;        /* pulls the card upward */
+}
+
+
+    .card{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:20px;
+      align-items:center;
+    }
+
+    /* Upload Area */
+    .drop{
+      border:2px dashed rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:20px;
+      text-align:center;
+      transition:.2s;
+    }
+    .drop.dragover{
+      border-color:var(--green-300);
+      background:rgba(110,231,183,.12)
+    }
+
+    .btn-file{
+      padding:12px 16px;
+      border-radius:10px;
+      background:#fff;
+      color:#04210f;
+      font-weight:800;
+      border:none;
+      cursor:pointer;
+    }
+
+    .preview{
+      margin-top:14px;
+      display:none;
+    }
+    .preview img{
+      width:min(450px,100%);
+      border-radius:14px;
+      box-shadow:var(--shadow);
+    }
+
+    label{
+      font-weight:600;
+      margin-top:12px;
+      display:block;
+    }
+select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    color: #e8f9f1;
+    font-weight: 600;
+    appearance: none;  /* removes the default OS look */
+}
+select::-ms-expand {
+    display: none;
+}
+
+select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='14' viewBox='0 0 24 24' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+select option {
+    background: #0b3d2e;      /* Match PlantGuard theme */
+    color: white;
+    padding: 10px;
+    border: none;
+}
+
+
+    .btn{
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn-primary{
+      background:linear-gradient(180deg,var(--green-500),#22c55e);
+      color:#04210f;
+    }
+    .btn-ghost{
+      background:transparent;
+      border:1px solid rgba(255,255,255,.25);
+      color:#fff;
+    }
+
+    .toast{
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      display:none;
+      font-weight:700;
+    }
+
+    label {
+    font-weight:600;
+    margin-top:18px;
+    margin-bottom:6px;   /* <-- Add spacing BELOW label */
+    display:block;
+}
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/index"><i class="fa-solid fa-leaf"></i> PlantGuard AI</a>
+    <nav>
+      <ul style="display:flex; list-style:none; gap:18px; margin:0; padding:0;">
+        <li><a href="/index">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/about2">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+<!-- HERO -->
+<section class="hero">
+  <h1>AI-Powered Plant Disease Detection</h1>
+  <p class="sub">Upload a plant leaf image — get instant disease prediction, metadata solutions, PDF report, and more.</p>
+</section>
+
+
+<!-- MAIN CLASSIFIER -->
+<section class="section" id="classifier">
+  <div class="card">
+    <div class="grid">
+
+      <!-- LEFT FORM -->
+      <div>
+        <h2>Leaf Disease Classifier</h2>
+
+        <form id="uploadForm" autocomplete="off">
+
+          <!-- DROPZONE -->
+          <label class="drop" id="dropZone">
+
+            <!-- Upload UI -->
+            <div id="uploadUI">
+              <button type="button" class="btn-file" id="pickBtn">
+                <i class="fa-solid fa-upload"></i> Choose Image
+              </button>
+              <p id="fileHint" class="meta">JPG / PNG / WEBP up to 10MB</p>
+            </div>
+
+            <input type="file" id="fileInput"
+              accept="image/png,image/jpeg,image/jpg,image/webp" hidden />
+
+            <div class="preview" id="preview">
+              <img id="previewImg" alt="Preview">
+            </div>
+          </label>
+
+          <!-- PLANT -->
+          <!-- <label for="plant">Plant Type</label>
+          <select id="plant" name="plant">
+            <option value="">-- Auto detect plant --</option>
+            <option value="Coffee">Coffee</option>
+            <option value="Tea">Tea</option>
+            <option value="Cinammon">Cinammon</option>
+          </select> -->
+
+          <!-- CHECKBOX -->
+          <label style="margin-top:12px; display:flex; gap:8px;">
+            <input type="checkbox" id="unknownMeta" />
+            <span>I don't know soil/weather</span>
+          </label>
+
+          <!-- SOIL -->
+          
+          <div id="soilContainer">
+            <label for="soil">Soil Type</label>
+            <select id="soil">
+              <option value="">-- Optional --</option>
+              <option value="Loamy">Loamy</option>
+              <option value="Sandy">Sandy</option>
+              <option value="Clayey">Clayey</option>
+            </select>
+          </div>
+
+
+          <!-- WEATHER -->
+          
+          <div id="weatherContainer">
+            <label for="weather">Weather</label>
+            <select id="weather">
+              <option value="">-- Optional --</option>
+              <option value="Sunny">Sunny</option>
+              <option value="Rainy">Rainy</option>
+              <option value="Humid">Humid</option>
+              <option value="Cloudy">Cloudy</option>
+            </select>
+          </div>
+
+
+          <!-- BUTTONS -->
+          <div style="margin-top:18px; display:flex; gap:12px;">
+            <button class="btn btn-primary" id="predictBtn" type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i> Predict
+            </button>
+            <button class="btn btn-ghost" id="clearBtn" type="button">
+              <i class="fa-solid fa-eraser"></i> Clear
+            </button>
+          </div>
+
+          <div class="toast" id="alertBox"></div>
+        </form>
+      </div>
+
+      <!-- RIGHT IMAGE -->
+      <div>
+        <img src="{{ url_for('static', filename='img.png') }}" 
+             style="width:100%; border-radius:14px; box-shadow:var(--shadow);">
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+  <div style="opacity:.8; padding:24px; text-align:center;">
+    © 2025 PlantGuard AI
+  </div>
+</footer>
+
+<!-- ================== IMAGE REJECTION MODAL ================== -->
+<div id="rejectModal" 
+  style="
+    display:none; 
+    position:fixed; 
+    inset:0; 
+    background:rgba(0,0,0,0.6); 
+    z-index:9999; 
+    align-items:center; 
+    justify-content:center;
+  ">
+  <div style="
+      background:#0b2820; 
+      padding:20px; 
+      border-radius:12px; 
+      width:90%; 
+      max-width:480px; 
+      color:white; 
+      text-align:left;
+    ">
+    <h3 style="margin-top:0;">Image Not Accepted</h3>
+    <p id="rejectMsg">
+      This image does not appear to be a plant leaf. Please upload a clear leaf photo.
+    </p>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button id="rejectClose" class="btn btn-ghost">Close</button>
+      <button id="rejectTips" class="btn btn-primary">How to take a good leaf photo</button>
+    </div>
+  </div>
+</div>
+<!-- ============================================================= -->
+
+
+
+<!-- JS -->
+<script>
+const fileInput = document.getElementById("fileInput");
+const dropZone  = document.getElementById("dropZone");
+const preview   = document.getElementById("preview");
+const previewImg = document.getElementById("previewImg");
+const pickBtn   = document.getElementById("pickBtn");
+const uploadUI  = document.getElementById("uploadUI");
+
+const soilSel    = document.getElementById("soil");
+const weatherSel = document.getElementById("weather");
+const unknownMeta = document.getElementById("unknownMeta");
+const plantSel   = document.getElementById("plant");
+const predictBtn = document.getElementById("predictBtn");
+const clearBtn   = document.getElementById("clearBtn");
+const alertBox   = document.getElementById("alertBox");
+
+/* Click to open file picker */
+pickBtn.addEventListener("click", ()=> fileInput.click());
+
+/* Dragging */
+dropZone.addEventListener("dragover", e=>{
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+dropZone.addEventListener("dragleave", ()=> dropZone.classList.remove("dragover"));
+
+/* Drop Upload */
+dropZone.addEventListener("drop", e=>{
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+
+  fileInput.files = e.dataTransfer.files;
+
+  uploadUI.style.display = "none";
+
+  const url = URL.createObjectURL(file);
+  previewImg.src = url;
+  preview.style.display = "block";
+});
+
+/* Normal File Select */
+fileInput.addEventListener("change", ()=>{
+  const f = fileInput.files[0];
+  if(!f) return;
+
+  uploadUI.style.display = "none";
+
+  const url = URL.createObjectURL(f);
+  previewImg.src = url;
+  preview.style.display = "block";
+});
+
+/* Hide soil/weather if unknownMeta checked */
+unknownMeta.addEventListener("change", ()=>{
+  const hide = unknownMeta.checked;
+
+  const soilDiv = document.getElementById("soilContainer");
+  const weatherDiv = document.getElementById("weatherContainer");
+
+  if (soilDiv) soilDiv.style.display = hide ? "none" : "block";
+  if (weatherDiv) weatherDiv.style.display = hide ? "none" : "block";
+});
+
+/* Clear Button */
+clearBtn.addEventListener("click", ()=>{
+  fileInput.value = "";
+  preview.style.display = "none";
+  uploadUI.style.display = "block";
+});
+
+/* Toast */
+function showAlert(msg, color="#1e7f53"){
+  alertBox.textContent = msg;
+  alertBox.style.background = color;
+  alertBox.style.display = "block";
+}
+
+/* Prediction API */
+async function analyze(file){
+  const fd = new FormData();
+  fd.append("image", file);
+
+  // SAFE CHECKS for null elements
+  fd.append("plant",   plantSel   ? plantSel.value   : "");
+  
+  if(unknownMeta.checked){
+    fd.append("soil", "");
+    fd.append("weather", "");
+  } else {
+    fd.append("soil",    soilSel    ? soilSel.value    : "");
+    fd.append("weather", weatherSel ? weatherSel.value : "");
+  }
+
+  const res = await fetch("/api/predict", { method:"POST", body:fd });
+
+  if(!res.ok){
+    let err = await res.json();
+    throw new Error(err.error || "Prediction failed");
+  }
+
+  return res.json();
+}
+
+// ---------------------- REJECTION MODAL JS ----------------------
+function showRejectModal(msg){
+  const modal = document.getElementById("rejectModal");
+  const p = document.getElementById("rejectMsg");
+  p.textContent = msg || "This image does not appear to be a plant leaf. Please upload a clear leaf photo.";
+  modal.style.display = "flex";
+}
+
+document.getElementById("rejectClose").onclick = ()=>{
+  document.getElementById("rejectModal").style.display = "none";
+};
+
+document.getElementById("rejectTips").onclick = ()=>{
+  alert(
+    "Tips:\n\n"+
+    "• Place leaf on a plain background\n"+
+    "• Make sure full leaf is visible\n"+
+    "• Avoid shadows and low light\n"+
+    "• Avoid hands or other objects\n"+
+    "• Use daylight or bright lighting"
+  );
+};
+// ----------------------------------------------------------------
+
+
+/* Submit Handler */
+document.getElementById("uploadForm").addEventListener("submit", async(e)=>{
+  e.preventDefault();
+
+  const file = fileInput.files[0];
+  if(!file){
+    showAlert("Please upload an image", "#b91c1c");
+    return;
+  }
+
+  predictBtn.disabled = true;
+  predictBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Predicting…`;
+
+  try{
+    const result = await analyze(file);
+    localStorage.setItem("pgai:result", JSON.stringify(result));
+    showAlert("Opening result…", "#1d4ed8");
+    setTimeout(()=> window.location.href="/result", 600);
+  } catch(err){
+
+    // If the server rejected the image because it is not a leaf
+    if (err.message && err.message.toLowerCase().includes("not a plant leaf")) {
+        showRejectModal(err.message);
+    } else {
+        showAlert(err.message,"#b91c1c");
+    }
+} finally {
+    predictBtn.disabled = false;
+    predictBtn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Predict`;
+  }
+});
+</script>
+
+</body>
+</html>

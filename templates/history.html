@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PlantGuard History</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<style>
+body{
+  margin:0; font-family:Inter,system-ui; color:white;
+  background:radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+}
+
+.nav{
+  position:sticky; top:0;
+  backdrop-filter:blur(10px);
+  background:rgba(5,20,14,.45);
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.nav-inner{
+  max-width:1100px; margin:auto;
+  display:flex; justify-content:space-between;
+  padding:14px 20px;
+}
+.nav a{ color:#e5f7ee; text-decoration:none; font-weight:600; }
+
+.section{
+  max-width:1100px; margin:auto; padding:40px 20px;
+}
+.card{
+  background:rgba(255,255,255,.08);
+  border-radius:20px; padding:20px;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+}
+.item{
+  background:rgba(255,255,255,.06);
+  border-radius:16px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
+}
+.item img{
+  width:100%; height:180px; object-fit:cover;
+}
+
+.badge{
+  background:rgba(255,255,255,.2);
+  padding:4px 8px;
+  border-radius:12px;
+  font-size:12px; font-weight:600;
+}
+
+.tag{
+  background:rgba(255,255,255,.2);
+  padding:4px 10px; border-radius:12px;
+  margin:2px; font-size:12px;
+  cursor:pointer; display:inline-block;
+}
+
+.actions{ display:flex; gap:8px; padding:8px; }
+
+.btn{
+  padding:8px 12px; border-radius:10px;
+  cursor:pointer; font-weight:700;
+}
+.btn-primary{
+  background:#22c55e; color:#04210f;
+}
+.btn-ghost{
+  background:transparent; color:white;
+  border:1px solid rgba(255,255,255,.2);
+}
+
+.search-box{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);
+  padding:8px 12px;
+  border-radius:12px;
+}
+.search-box input{
+  background:transparent; border:none; outline:none; color:white;
+}
+</style>
+</head>
+
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/index"><i class="fa-solid fa-leaf"></i> PlantGuard AI</a>
+    <nav>
+      <ul style="display:flex; list-style:none; gap:18px; margin:0; padding:0;">
+        <li><a href="/index">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/about2">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="card">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+      <div>
+        <h2>Prediction History</h2>
+        <p style="opacity:.8;">{{ history|length }} records</p>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <div class="search-box">
+          <i class="fa fa-search"></i>
+          <input id="search" placeholder="Search...">
+        </div>
+        <a href="/export_csv"><button class="btn btn-ghost">Upload all to CSV</button></a>
+        <button class="btn btn-ghost" onclick="confirmDelete()">Delete All</button>
+      </div>
+    </div>
+
+    {% if history %}
+    <div id="list" class="grid">
+
+      {% for h in history %}
+      <article class="item" 
+        data-label="{{ h.predicted_class }} {{ h.plant_name }} {{ h.severity }} {{ h.tags or '' }}">
+
+        <img src="/static/uploads/{{ h.image_path.split('/')[-1] }}">
+
+        <div style="padding:10px;">
+          <div class="badge">{{ h.predicted_class }}</div>
+          <!-- <div style="opacity:.8; font-size:13px;">{{ (h.confidence*100)|round(2) }}%</div> -->
+
+          <!-- TAGS -->
+          <div style="margin-top:6px;">
+            {% if h.tags %}
+              {% for t in h.tags.split(',') %}
+                <span class="tag" data-tag="{{ t }}">#{{ t }}</span>
+              {% endfor %}
+            {% else %}
+              <span style="opacity:.6; font-size:12px;">No tags</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="/view/{{ h.id }}"><i class="fa fa-eye"></i></a>
+          <a class="btn btn-ghost" href="/export_pdf/{{ h.id }}"><i class="fa fa-file-pdf"></i></a>
+          <!-- <a class="btn btn-ghost" href="/qr/{{ h.id }}"><i class="fa fa-qrcode"></i></a> -->
+          <a class="btn btn-ghost"
+            href="/delete_prediction/{{ h.id }}"
+            onclick="return confirm('Are you sure you want to delete this prediction? This action cannot be undone.');">
+            <i class="fa fa-trash"></i>
+          </a>
+
+        </div>
+      </article>
+      {% endfor %}
+
+    </div>
+    {% else %}
+      <h3 style="text-align:center;">No history found</h3>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+// Search bar
+const q = document.getElementById("search");
+q.addEventListener("input", ()=>{
+  const term = q.value.toLowerCase();
+  document.querySelectorAll("#list .item").forEach(card=>{
+    const label = card.dataset.label.toLowerCase();
+    card.style.display = label.includes(term) ? "" : "none";
+  });
+});
+
+// Tag clicks
+document.querySelectorAll(".tag").forEach(btn=>{
+  btn.onclick = ()=>{
+    const tag = btn.dataset.tag.toLowerCase();
+    q.value = ""; // clear search
+    document.querySelectorAll("#list .item").forEach(card=>{
+      card.style.display = card.dataset.label.toLowerCase().includes(tag) ? "" : "none";
+    });
+  };
+});
+
+function confirmDelete(){
+  if(confirm("Delete ALL history? This cannot be undone.")){
+    location.href="/delete_all_history";
+  }
+}
+</script>
+
+</body>
+</html>

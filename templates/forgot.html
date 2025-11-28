@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forgot password — PlantGuard AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{ --green-900:#0b3d2e; --green-800:#115941; --green-700:#166d4f; --green-500:#2ecc71; --green-400:#3dd087; --green-300:#6ee7b7; --white:#fff; --muted:#94a3b8; --glass:rgba(255,255,255,.08); --shadow:0 20px 60px rgba(0,0,0,.20); }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+    .nav{position:sticky; top:0; z-index:20; backdrop-filter:saturate(1.2) blur(10px); background:linear-gradient(0deg, rgba(5,20,14,.45), rgba(5,20,14,.45)); border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800}
+    .brand i{color:var(--green-400)}
+    .nav a{color:#e5f7ee; text-decoration:none; font-weight:600; opacity:.9}
+    .nav a:hover{opacity:1; color:var(--green-300)}
+    .nav ul{display:flex; gap:18px; list-style:none; margin:0; padding:0}
+
+    .section{max-width:1100px; margin:0 auto; padding:56px 20px}
+    .auth{display:grid; grid-template-columns:1.05fr .95fr; gap:22px; align-items:stretch}
+    .card{background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:20px; box-shadow:var(--shadow); padding:24px}
+    .illustration{border-radius:18px; overflow:hidden}
+    .illustration img{width:100%; height:100%; object-fit:cover; display:block}
+
+    .form h1{font-family:Poppins,Inter,sans-serif; margin:0 0 6px}
+    .form p{margin:0 0 18px; color:#dafeea}
+
+    .field{display:flex; flex-direction:column; gap:6px; margin:12px 0}
+    .field label{font-weight:800}
+    .control{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:10px 12px}
+    .control input{background:transparent; border:none; outline:none; color:#fff; width:100%}
+
+    .btn{appearance:none; border:none; cursor:pointer; padding:12px 18px; border-radius:12px; font-weight:800; letter-spacing:.2px; transition:transform .12s ease, box-shadow .2s ease, background .2s ease}
+    .btn-primary{background:linear-gradient(180deg, var(--green-500), #22c55e); color:#04210f; box-shadow:0 15px 35px rgba(34,197,94,.35)}
+    .btn-ghost{background:transparent; color:#eafff3; border:1px solid rgba(255,255,255,.18)}
+
+    .error{margin-top:10px; padding:10px 12px; border-radius:10px; background:#7f1d1d; border:1px solid rgba(255,255,255,.18); font-weight:800}
+    .success{margin-top:10px; padding:10px 12px; border-radius:10px; background:#1e7f53; border:1px solid rgba(255,255,255,.18); font-weight:800}
+
+    @media (max-width:900px){ .auth{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="/"><i class="fa-solid fa-leaf"></i> PlantGuard&nbsp;AI</a>
+      <nav aria-label="main">
+        <ul>
+          <li><a href="/">How it works</a></li>
+          <li><a href="/">Try it</a></li>
+          <li><a href="/history">History</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="auth">
+      <div class="card form">
+        <h1>Reset your password</h1>
+        <p>Enter your account email and a new password.</p>
+        <!-- ✅ Flask backend integration -->
+        <form action="/forgot" method="POST" autocomplete="off">
+          <div class="field">
+            <label for="email">Email</label>
+            <div class="control"><i class="fa-regular fa-envelope"></i><input id="email" name="email" type="email" required placeholder="you@example.com"/></div>
+          </div>
+          <div class="field">
+            <label for="password">New password</label>
+            <div class="control"><i class="fa-solid fa-lock"></i><input id="password" name="password" type="password" minlength="6" required placeholder="••••••••"/></div>
+          </div>
+          <div class="field">
+            <label for="confirm">Confirm new password</label>
+            <div class="control"><i class="fa-solid fa-lock"></i><input id="confirm" name="confirm" type="password" minlength="6" required placeholder="Repeat password"/></div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px">
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-key"></i> Reset password</button>
+            <a class="btn btn-ghost" href="/login"><i class="fa-solid fa-arrow-left"></i> Back to sign in</a>
+          </div>
+
+          <!-- ✅ Flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, msg in messages %}
+                <div class="{{ category }}">{{ msg }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </form>
+      </div>
+      <div class="illustration">
+        <img src="{{ url_for('static', filename='img2.png') }}" alt="illustration"/>
+
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding:34px 16px; text-align:center; color:#d6ffe9; background:rgba(0,0,0,.2); border-top:1px solid rgba(255,255,255,.08)">
+    <div style="opacity:.8; font-size:13px">© 2025 PlantGuard AI. All rights reserved.</div>
+  </footer>
+</body>
+</html>

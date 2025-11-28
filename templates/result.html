@@ -1,0 +1,223 @@
+<!-- No changes needed as the header already matches the desired output -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prediction Result — PlantGuard AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --green-500:#2ecc71;
+      --white:#fff;
+      --glass:rgba(255,255,255,.08);
+      --shadow:0 20px 60px rgba(0,0,0,.20);
+    }
+
+    body{
+      margin:0;
+      color:var(--white);
+      font-family:Inter,system-ui;
+      background:radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%);
+    }
+
+    .nav{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter: blur(10px);
+      background:rgba(5,20,14,.45);
+      border-bottom:1px solid rgba(255,255,255,.1);
+    }
+    .nav-inner{
+      max-width:1100px; margin:0 auto;
+      padding:14px 20px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .nav a{ color:#e5f7ee; text-decoration:none; font-weight:600; }
+
+    .section{
+      max-width:1100px;
+      margin:0 auto;
+      padding:50px 20px;
+    }
+
+    .card{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:0.9fr 1.1fr;
+      gap:24px;
+    }
+
+    img.leaf-img{
+      width:100%;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+    }
+
+    h3{ margin-top:16px; }
+    p.meta{ margin:3px 0 14px 0; opacity:.9; }
+
+    .btn{
+      padding:10px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .btn-primary{
+      background:linear-gradient(180deg,var(--green-500),#22c55e);
+      color:#04210f;
+    }
+    .btn-ghost{
+      background:transparent;
+      border:1px solid rgba(255,255,255,.18);
+      color:white;
+    }
+
+    /* TAGS */
+    .tag{
+      display:inline-block;
+      background:rgba(255,255,255,.15);
+      padding:6px 12px;
+      border-radius:12px;
+      margin:3px;
+      font-size:13px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/index"><i class="fa-solid fa-leaf"></i> PlantGuard AI</a>
+    <nav>
+      <ul style="list-style:none; display:flex; gap:18px;">
+        <li><a href="/index">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/about2">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="card">
+
+    <h2><i class="fa-solid fa-file-medical"></i> Prediction Result</h2>
+
+    <div class="grid">
+      <div>
+        <img id="leafImg" class="leaf-img">
+      </div>
+
+      <div>
+        <h3>Disease</h3><p class="meta" id="cls"></p>
+
+        <h3>Plant</h3><p class="meta" id="plant"></p>
+
+        <h3>Severity</h3><p class="meta" id="severity"></p>
+
+        <h3>Confidence</h3><p class="meta" id="confidence"></p>
+
+        <h3>Soil</h3><p class="meta" id="soil"></p>
+
+        <h3>Weather</h3><p class="meta" id="weather"></p>
+
+        <h3>Solution</h3><p class="meta" id="solution"></p>
+
+        <h3>Agronomic Tips</h3><p class="meta" id="tips"></p>
+
+        <h3>Chemicals</h3><p class="meta" id="chemicals"></p>
+
+        <h3>Dosage</h3><p class="meta" id="dosage"></p>
+
+        <h3>Preventive</h3><p class="meta" id="preventive"></p>
+
+        <h3>Spray Interval</h3><p class="meta" id="spray"></p>
+
+        <h3>Predicted At</h3><p class="meta" id="time"></p>
+
+        <!-- TAG INPUT -->
+        <h3>Tags</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input id="tagInput" placeholder="add tags separated by comma" 
+            style="flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.18); 
+            background:rgba(255,255,255,.05); color:white;">
+          <button id="saveTagsBtn" class="btn btn-primary">Save Tags</button>
+        </div>
+        <p id="existingTags" style="opacity:.85; margin-top:8px;">—</p>
+
+        <div style="margin-top:22px; display:flex; gap:12px;">
+          <a href="/index"><button class="btn btn-primary">Back Home</button></a>
+          <a href="/history"><button class="btn btn-ghost">History</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><div style="opacity:.8; padding:24px; text-align:center;">© 2025 PlantGuard AI</div></footer>
+
+<script>
+function loadResult(){
+  const saved = localStorage.getItem("pgai:result");
+  if(!saved) return;
+  const r = JSON.parse(saved);
+
+  document.getElementById("leafImg").src = r.image_url;
+  document.getElementById("cls").textContent = r.predicted_class;
+  document.getElementById("plant").textContent = r.plant_name;
+  document.getElementById("severity").textContent = r.severity;
+  document.getElementById("confidence").textContent = (r.confidence*100).toFixed(2)+"%";
+  document.getElementById("soil").textContent = r.soil || "—";
+  document.getElementById("weather").textContent = r.weather || "—";
+  document.getElementById("solution").textContent = r.solution || "—";
+  document.getElementById("tips").textContent = r.tips || r.agronomic || "—";
+  document.getElementById("chemicals").textContent = r.chemicals || "—";
+  document.getElementById("dosage").textContent = r.dosage || "—";
+  document.getElementById("preventive").textContent = r.preventive || "—";
+  document.getElementById("spray").textContent = r.spray_interval || "—";
+  document.getElementById("time").textContent = new Date().toLocaleString();
+
+  document.getElementById("existingTags").textContent =
+    r.tags ? r.tags.split(",").map(t=>"#"+t).join(" ") : "—";
+
+  // Save button
+  document.getElementById("saveTagsBtn").onclick = async()=>{
+    const raw = document.getElementById("tagInput").value;
+    const fd = new FormData();
+    fd.append("tags", raw);
+
+    const res = await fetch("/add_tags/"+r.id,{method:"POST", body:fd});
+    const j = await res.json();
+
+    if(res.ok){
+      document.getElementById("existingTags").textContent = 
+        j.tags.split(",").map(t=>"#"+t).join(" ");
+
+      r.tags = j.tags;
+      localStorage.setItem("pgai:result", JSON.stringify(r));
+      alert("Tags saved!");
+    } else {
+      alert(j.error || "Failed");
+    }
+  };
+}
+
+setTimeout(loadResult, 50);
+</script>
+
+</body>
+</html>

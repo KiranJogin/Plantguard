@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>View Result — PlantGuard AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root{ --glass:rgba(255,255,255,.08); --white:#fff; }
+    body{ margin:0; color:var(--white); background:radial-gradient(1200px 600px at 20% -10%, #1b4332 0%, #0b2820 55%, #071a14 100%); font-family:Inter; }
+    .nav{ position:sticky; top:0; backdrop-filter:blur(10px); background:rgba(5,20,14,.45); border-bottom:1px solid rgba(255,255,255,.1); }
+    .nav-inner{ max-width:1100px; padding:14px 20px; margin:auto; display:flex; justify-content:space-between; }
+    .nav a{ color:#e5f7ee; text-decoration:none; font-weight:600; }
+    .section{ max-width:1100px; margin:auto; padding:50px 20px; }
+    .card{ background:var(--glass); border:1px solid rgba(255,255,255,.14); border-radius:20px; padding:24px; }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    img{ width:100%; border-radius:16px; }
+    .btn{ padding:10px 16px; border-radius:12px; cursor:pointer; font-weight:800; }
+    .btn-primary{ background:#22c55e; color:#04210f; }
+    .btn-ghost{ border:1px solid rgba(255,255,255,.18); background:transparent; color:white; }
+
+    .tag{
+      background:rgba(255,255,255,.15);
+      padding:6px 12px;
+      border-radius:12px;
+      margin:3px;
+      font-size:13px;
+      display:inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/index"><i class="fa-solid fa-leaf"></i> PlantGuard AI</a>
+    <nav>
+      <ul style="display:flex; list-style:none; gap:18px; margin:0; padding:0;">
+        <li><a href="/index">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/about2">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+<div class="card">
+  <h2><i class="fa-solid fa-file-lines"></i> Detailed Report</h2>
+
+  <div class="grid">
+    <div><img src="{{ prediction.image_url if prediction.image_url else '' }}"></div>
+
+    <div>
+      <h3>Disease</h3><p>{{ prediction.predicted_class }}</p>
+
+      <h3>Plant</h3><p>{{ prediction.plant_name }}</p>
+
+      <h3>Severity</h3><p>{{ prediction.severity }}</p>
+
+      <h3>Confidence</h3><p>{{ (prediction.confidence*100)|round(2) }}%</p>
+
+      <h3>Soil</h3><p>{{ prediction.soil or '—' }}</p>
+
+      <h3>Weather</h3><p>{{ prediction.weather or '—' }}</p>
+
+      <h3>Solution</h3><p>{{ prediction.solution }}</p>
+
+      <h3>Agronomic Tips</h3><p>{{ prediction.agronomic or prediction.tips }}</p>
+
+      <h3>Chemicals</h3><p>{{ prediction.chemicals or prediction.biochemical }}</p>
+
+      <h3>Dosage</h3><p>{{ prediction.dosage }}</p>
+
+      <h3>Preventive</h3><p>{{ prediction.preventive }}</p>
+
+      <h3>Spray Interval</h3><p>{{ prediction.spray_interval }}</p>
+
+      <h3>Tags</h3>
+
+      <div style="margin-bottom:8px;">
+        {% if prediction.tags %}
+          {% for t in prediction.tags.split(',') %}
+            <span class="tag">#{{ t }}</span>
+          {% endfor %}
+        {% else %}
+          <span style="opacity:.7;">No tags</span>
+        {% endif %}
+      </div>
+
+      <input id="tagInput" value="{{ prediction.tags or '' }}" 
+        style="padding:8px; width:100%; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05); color:#fff;">
+      <button id="saveBtn" class="btn btn-primary" style="margin-top:8px;">Save Tags</button>
+
+      <div style="margin-top:20px;">
+        <a href="/history"><button class="btn btn-ghost">Back</button></a>
+      </div>
+
+    </div>
+  </div>
+</div>
+</section>
+
+<script>
+document.getElementById("saveBtn").onclick = async()=>{
+  const val = document.getElementById("tagInput").value;
+  const id = {{ prediction.id }};
+  const fd = new FormData();
+  fd.append("tags", val);
+
+  const res = await fetch("/add_tags/"+id,{method:"POST", body:fd});
+  const j = await res.json();
+  if(res.ok){
+     alert("Tags saved");
+     location.reload();
+  } else alert(j.error || "Failed");
+};
+</script>
+
+</body>
+</html>
